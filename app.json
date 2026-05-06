@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "app-factory-template",
+    "slug": "app-factory-template",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "app-factory-template",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#111111"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-asset",
+      "expo-sqlite"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
