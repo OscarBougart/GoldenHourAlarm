@@ -5,9 +5,9 @@ Read this fully before making any changes. Never deviate without being explicitl
 ## What this app is
 
 <!-- APP-SPECIFIC: Replace this section per app -->
-**App Name:** [APP_NAME]
-**One-liner:** [What it does in one sentence]
-**Core user action:** [The single most important thing the user does]
+**App Name:** Golden Hour Alarm
+**One-liner:** Auto-alarm for golden hour and blue hour at your exact location, every day.
+**Core user action:** See today's golden/blue hour times and get notified before they start.
 
 ## Design principles
 

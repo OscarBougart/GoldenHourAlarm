@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app-factory-template",
-    "slug": "app-factory-template",
+    "name": "GoldenHourAlarm",
+    "slug": "GoldenHourAlarm",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "app-factory-template",
