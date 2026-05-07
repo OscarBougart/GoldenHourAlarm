@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir /s \"c:\\\\Users\\\\User\\\\projects\\\\Goldenhouralarm\\\\assets\")"
+      "Bash(dir /s \"c:\\\\Users\\\\User\\\\projects\\\\Goldenhouralarm\\\\assets\")",
+      "Bash(copy \"c:\\\\Users\\\\User\\\\projects\\\\Goldenhouralarm\\\\assets\\\\images\\\\Inspiration\\\\goldenhour.png\" \"c:\\\\Users\\\\User\\\\projects\\\\Goldenhouralarm\\\\assets\\\\images\\\\goldenhour.png\")",
+      "PowerShell(Copy-Item \"c:\\\\Users\\\\User\\\\projects\\\\Goldenhouralarm\\\\assets\\\\images\\\\Inspiration\\\\goldenhour.png\" \"c:\\\\Users\\\\User\\\\projects\\\\Goldenhouralarm\\\\assets\\\\images\\\\goldenhour.png\")"
     ]
   }
 }

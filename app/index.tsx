@@ -19,23 +19,23 @@ import { useSunTimes } from '@/hooks/useSunTimes';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useNotifications, useScheduleAlarms } from '@/hooks/useNotifications';
 import { useTheme } from '@/src/theme';
-import { SPACE } from '@/constants/spacing';
+import { SPACE, RADIUS } from '@/constants/spacing';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/typography';
-import TimeCard from '@/components/TimeCard';
+import EventRow from '@/components/EventRow';
 import CountdownBanner from '@/components/CountdownBanner';
+import SunArc from '@/components/SunArc';
 import CitySearchModal from '@/components/CitySearchModal';
 import type { LightWindow } from '@/utils/types';
-import { LIGHT_WINDOW_LABELS } from '@/utils/types';
 import type { CityResult } from '@/hooks/useCitySearch';
 
 const TODAY = new Date();
 
-const WINDOW_ORDER: LightWindow[] = [
-  'morningBlue',
-  'morningGolden',
-  'eveningGolden',
-  'eveningBlue',
-];
+type Tab = 'morning' | 'evening';
+
+function isMorningDone(now: Date): boolean {
+  const h = now.getHours();
+  return h >= 12;
+}
 
 export default function TodayScreen(): React.JSX.Element {
   const theme    = useTheme();
@@ -57,6 +57,7 @@ export default function TodayScreen(): React.JSX.Element {
   const countdown = useCountdown(sunTimes);
 
   const [cityModalVisible, setCityModalVisible] = useState(false);
+  const [tab, setTab] = useState<Tab>(isMorningDone(new Date()) ? 'evening' : 'morning');
 
   useScheduleAlarms(sunTimes, alarmPrefs, settings.notificationOffsetMinutes);
 
@@ -67,6 +68,14 @@ export default function TodayScreen(): React.JSX.Element {
   useEffect(() => {
     requestPermission();
   }, [requestPermission]);
+
+  // Auto-switch tab when morning windows are all past
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTab(isMorningDone(new Date()) ? 'evening' : 'morning');
+    }, 60_000);
+    return () => clearInterval(timer);
+  }, []);
 
   const dateLabel = useMemo(() => {
     return TODAY.toLocaleDateString(undefined, {
@@ -79,6 +88,8 @@ export default function TodayScreen(): React.JSX.Element {
   const countdownIsGolden =
     countdown.key === 'morningGolden' || countdown.key === 'eveningGolden';
 
+  const use24h = settings.timeFormat === '24h';
+
   const handleCitySelect = async (city: CityResult) => {
     await setManualCity(city);
   };
@@ -87,6 +98,13 @@ export default function TodayScreen(): React.JSX.Element {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push('/settings');
   };
+
+  const handleTabPress = (t: Tab) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setTab(t);
+  };
+
+  const isActive = (key: LightWindow) => countdown.isActive && countdown.key === key;
 
   if (!hydrated || (locLoading && !location)) {
     return (
@@ -129,9 +147,8 @@ export default function TodayScreen(): React.JSX.Element {
           />
         }
       >
-        {/* Header */}
+        {/* ── Header ─────────────────────────────────────────────── */}
         <View style={styles.header}>
-          {/* Date + city pill */}
           <View style={styles.headerLeft}>
             <Text style={styles.dateText} numberOfLines={1} adjustsFontSizeToFit>
               {dateLabel}
@@ -150,7 +167,6 @@ export default function TodayScreen(): React.JSX.Element {
             </Pressable>
           </View>
 
-          {/* Settings icon top-right */}
           <Pressable
             style={styles.settingsBtn}
             onPress={handleSettingsPress}
@@ -161,7 +177,12 @@ export default function TodayScreen(): React.JSX.Element {
           </Pressable>
         </View>
 
-        {/* Countdown banner */}
+        {/* ── Sun Arc ────────────────────────────────────────────── */}
+        {sunTimes && (
+          <SunArc sunrise={sunTimes.sunrise} sunset={sunTimes.sunset} use24h={use24h} />
+        )}
+
+        {/* ── Countdown ──────────────────────────────────────────── */}
         {sunTimes && (
           <CountdownBanner
             targetKey={countdown.key}
@@ -171,26 +192,92 @@ export default function TodayScreen(): React.JSX.Element {
           />
         )}
 
-        {/* Time cards */}
+        {/* ── Morning / Evening tabs ──────────────────────────────── */}
+        <View style={styles.tabRow}>
+          {(['morning', 'evening'] as Tab[]).map((t) => (
+            <Pressable
+              key={t}
+              style={[styles.tab, tab === t && styles.tabActive]}
+              onPress={() => handleTabPress(t)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: tab === t }}
+              accessibilityLabel={`${t} events`}
+            >
+              <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>
+                {t === 'morning' ? 'Morning' : 'Evening'}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* ── Event rows ─────────────────────────────────────────── */}
         {sunTimes ? (
-          <View style={styles.cards}>
-            {WINDOW_ORDER.map((key) => {
-              const isGolden = key === 'morningGolden' || key === 'eveningGolden';
-              const isActive = countdown.isActive && countdown.key === key;
-              return (
-                <TimeCard
-                  key={key}
-                  window={key}
-                  label={LIGHT_WINDOW_LABELS[key]}
-                  timeRange={sunTimes[key]}
-                  isGolden={isGolden}
-                  alarmOn={alarmPrefs[key]}
-                  use24h={settings.timeFormat === '24h'}
-                  isActive={isActive}
+          <View style={styles.eventList}>
+            {tab === 'morning' ? (
+              <>
+                <EventRow
+                  variant="blue"
+                  label="Blue Hour"
+                  timeRange={sunTimes.morningBlue}
+                  use24h={use24h}
+                  isActive={isActive('morningBlue')}
+                  alarmOn={alarmPrefs.morningBlue}
+                  lightWindow="morningBlue"
                   onToggleAlarm={(w) => setAlarmPref(w, !alarmPrefs[w])}
                 />
-              );
-            })}
+                <View style={styles.divider} />
+                <EventRow
+                  variant="sunrise"
+                  label="Sunrise"
+                  timeRange={{ start: sunTimes.sunrise, end: sunTimes.sunrise }}
+                  use24h={use24h}
+                  isActive={false}
+                />
+                <View style={styles.divider} />
+                <EventRow
+                  variant="golden"
+                  label="Golden Hour"
+                  timeRange={sunTimes.morningGolden}
+                  use24h={use24h}
+                  isActive={isActive('morningGolden')}
+                  alarmOn={alarmPrefs.morningGolden}
+                  lightWindow="morningGolden"
+                  onToggleAlarm={(w) => setAlarmPref(w, !alarmPrefs[w])}
+                />
+              </>
+            ) : (
+              <>
+                <EventRow
+                  variant="golden"
+                  label="Golden Hour"
+                  timeRange={sunTimes.eveningGolden}
+                  use24h={use24h}
+                  isActive={isActive('eveningGolden')}
+                  alarmOn={alarmPrefs.eveningGolden}
+                  lightWindow="eveningGolden"
+                  onToggleAlarm={(w) => setAlarmPref(w, !alarmPrefs[w])}
+                />
+                <View style={styles.divider} />
+                <EventRow
+                  variant="sunset"
+                  label="Sunset"
+                  timeRange={{ start: sunTimes.sunset, end: sunTimes.sunset }}
+                  use24h={use24h}
+                  isActive={false}
+                />
+                <View style={styles.divider} />
+                <EventRow
+                  variant="blue"
+                  label="Blue Hour"
+                  timeRange={sunTimes.eveningBlue}
+                  use24h={use24h}
+                  isActive={isActive('eveningBlue')}
+                  alarmOn={alarmPrefs.eveningBlue}
+                  lightWindow="eveningBlue"
+                  onToggleAlarm={(w) => setAlarmPref(w, !alarmPrefs[w])}
+                />
+              </>
+            )}
           </View>
         ) : (
           <View style={styles.center}>
@@ -220,7 +307,7 @@ function makeStyles(theme: ReturnType<typeof useTheme>, isSmall: boolean) {
     content: {
       paddingHorizontal: isSmall ? SPACE.MD : SPACE.LG,
       paddingTop:        SPACE.XS,
-      gap:               SPACE.MD,
+      gap:               isSmall ? SPACE.MD : SPACE.LG,
       paddingBottom:     SPACE['2XL'] * 2,
     },
     center: {
@@ -238,9 +325,9 @@ function makeStyles(theme: ReturnType<typeof useTheme>, isSmall: boolean) {
       paddingBottom:  SPACE.SM,
     },
     headerLeft: {
-      flex:    1,
-      gap:     4,
-      flexShrink: 1,
+      flex:         1,
+      gap:          4,
+      flexShrink:   1,
       paddingRight: SPACE.SM,
     },
     dateText: {
@@ -267,8 +354,37 @@ function makeStyles(theme: ReturnType<typeof useTheme>, isSmall: boolean) {
       justifyContent: 'center',
       flexShrink:     0,
     },
-    cards: {
-      gap: isSmall ? SPACE.SM : SPACE.MD,
+    tabRow: {
+      flexDirection: 'row',
+      gap:           SPACE.SM,
+    },
+    tab: {
+      flex:            1,
+      alignItems:      'center',
+      paddingVertical: SPACE.SM,
+      borderBottomWidth: 2,
+      borderBottomColor: 'rgba(255,255,255,0.20)',
+    },
+    tabActive: {
+      borderBottomColor: '#FFFFFF',
+    },
+    tabText: {
+      fontSize:   FONT_SIZE.MD,
+      fontWeight: FONT_WEIGHT.BOLD,
+      color:      'rgba(255,255,255,0.45)',
+    },
+    tabTextActive: {
+      color: '#FFFFFF',
+    },
+    eventList: {
+      backgroundColor: theme.bgCard,
+      borderRadius:    RADIUS.LG,
+      overflow:        'hidden',
+    },
+    divider: {
+      height:          1,
+      backgroundColor: 'rgba(255,255,255,0.10)',
+      marginHorizontal: SPACE.LG,
     },
     loadingText: {
       fontSize: FONT_SIZE.MD,

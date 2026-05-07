@@ -1,5 +1,5 @@
 import SunCalc from 'suncalc';
-import type { SunTimes, TimeRange } from './types';
+import type { SunTimes, TimeRange, LightWindow } from './types';
 
 /**
  * Computes golden hour and blue hour time ranges for a given lat/lng and date.
@@ -46,7 +46,14 @@ export function computeSunTimes(lat: number, lng: number, date: Date): SunTimes 
     end:   times.nauticalDusk, // ~-12°
   };
 
-  return { morningGolden, morningBlue, eveningGolden, eveningBlue };
+  return {
+    morningGolden,
+    morningBlue,
+    eveningGolden,
+    eveningBlue,
+    sunrise: times.sunrise,
+    sunset:  times.sunset,
+  };
 }
 
 export function formatTime(date: Date, use24h: boolean): string {
@@ -73,7 +80,7 @@ export function formatCountdown(ms: number): string {
 /** Returns which window is currently active or upcoming, and its start time */
 export function getNextWindow(
   times: SunTimes,
-): { key: keyof SunTimes; start: Date; end: Date; isActive: boolean } | null {
+): { key: LightWindow; start: Date; end: Date; isActive: boolean } | null {
   const now = Date.now();
   const windows = (
     ['morningBlue', 'morningGolden', 'eveningGolden', 'eveningBlue'] as const

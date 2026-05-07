@@ -10,6 +10,8 @@ export interface SunTimes {
   morningBlue: TimeRange;
   eveningGolden: TimeRange;
   eveningBlue: TimeRange;
+  sunrise: Date;
+  sunset: Date;
 }
 
 export interface LocationData {

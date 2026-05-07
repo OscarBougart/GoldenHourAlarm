@@ -1,7 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
-import { useTheme } from '@/src/theme';
-import { SPACE, RADIUS } from '@/constants/spacing';
+import { Text, StyleSheet } from 'react-native';
 import { FONT_SIZE, FONT_WEIGHT } from '@/constants/typography';
 import { LIGHT_WINDOW_LABELS } from '@/utils/types';
 import { formatCountdown } from '@/utils/sunCalc';
@@ -19,84 +17,40 @@ export default function CountdownBanner({
   msLeft,
   isActive,
 }: CountdownBannerProps): React.JSX.Element {
-  const theme  = useTheme();
-  const { width } = useWindowDimensions();
-  const isSmall = width < 375;
-
   if (!targetKey) {
-    return (
-      <View style={[styles.banner, { backgroundColor: theme.bgCard }]}>
-        <Text style={styles.noMore}>No more light windows today</Text>
-      </View>
-    );
+    return <Text style={styles.text}>No more light windows today</Text>;
   }
 
   const label  = LIGHT_WINDOW_LABELS[targetKey];
-  const prefix = isActive ? 'Ends in' : 'Starts in';
+  const prefix = isActive ? 'ends in' : 'in';
 
   return (
-    <View
-      style={[styles.banner, { backgroundColor: theme.bgCard, padding: isSmall ? SPACE.MD : SPACE.LG }]}
-      accessibilityLabel={`${prefix} ${formatCountdown(msLeft)}`}
-    >
-      <View style={styles.row}>
-        <View style={styles.left}>
-          <Text style={styles.prefixText}>
-            {isActive ? 'HAPPENING NOW' : 'NEXT WINDOW'}
-          </Text>
-          <Text style={[styles.windowName, { fontSize: isSmall ? FONT_SIZE.MD : FONT_SIZE.LG }]}>
-            {label}
-          </Text>
-        </View>
-        <View style={styles.countdownBox}>
-          <Text style={[styles.countdownText, { fontSize: isSmall ? 22 : FONT_SIZE['2XL'] }]}>
-            {formatCountdown(msLeft)}
-          </Text>
-          <Text style={styles.prefixText}>{prefix}</Text>
-        </View>
-      </View>
-    </View>
+    <Text style={styles.text} accessibilityLabel={`${label} ${prefix} ${formatCountdown(msLeft)}`}>
+      <Text style={styles.name}>{label}</Text>
+      {' '}
+      <Text style={styles.muted}>{prefix}</Text>
+      {' '}
+      <Text style={styles.countdown}>{formatCountdown(msLeft)}</Text>
+    </Text>
   );
 }
 
 const styles = StyleSheet.create({
-  banner: {
-    borderRadius: RADIUS.LG,
-    padding:      SPACE.LG,
+  text: {
+    fontSize:  FONT_SIZE.SM,
+    textAlign: 'center' as const,
+    color:     'rgba(255,255,255,0.65)',
   },
-  row: {
-    flexDirection:  'row',
-    alignItems:     'center',
-    justifyContent: 'space-between',
-  },
-  left: {
-    flex:           1,
-    paddingRight:   SPACE.MD,
-  },
-  prefixText: {
-    fontSize:      FONT_SIZE.XS,
-    fontWeight:    FONT_WEIGHT.MEDIUM,
-    letterSpacing: 1,
-    textTransform: 'uppercase' as const,
-    color:         'rgba(255,255,255,0.60)',
-  },
-  windowName: {
-    fontWeight: FONT_WEIGHT.BOLD,
-    marginTop:  SPACE.XS,
+  name: {
+    fontWeight: FONT_WEIGHT.MEDIUM,
     color:      '#FFFFFF',
   },
-  countdownBox: {
-    alignItems: 'flex-end',
-    gap:        SPACE.XS,
+  muted: {
+    color: 'rgba(255,255,255,0.55)',
   },
-  countdownText: {
-    fontWeight:  FONT_WEIGHT.BLACK,
-    fontVariant: ['tabular-nums'],
+  countdown: {
+    fontWeight:  FONT_WEIGHT.BOLD,
     color:       '#FFFFFF',
-  },
-  noMore: {
-    fontSize:  FONT_SIZE.MD,
-    color:     'rgba(255,255,255,0.60)',
-    textAlign: 'center' as const,
+    fontVariant: ['tabular-nums'],
   },
 });

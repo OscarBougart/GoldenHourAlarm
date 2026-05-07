@@ -7,6 +7,9 @@
     "scheme": "goldenhouralarm",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#C05A0A"
+    },
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
