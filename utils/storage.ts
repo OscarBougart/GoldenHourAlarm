@@ -96,9 +96,11 @@ export const storage = {
 // Centralise all storage keys here to avoid typos across the app.
 
 export const STORAGE_KEYS = {
-  // USER_PROFILE: 'user_profile',
-  // SETTINGS: 'settings',
-  // ONBOARDING_COMPLETE: 'onboarding_complete',
+  LOCATION:             'location',
+  ALARM_PREFS:          'alarm_prefs',
+  NOTIFICATION_OFFSET:  'notification_offset',
+  THEME:                'theme',
+  TIME_FORMAT:          'time_format',
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

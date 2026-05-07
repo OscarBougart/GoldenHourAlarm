@@ -16,15 +16,9 @@ export default function RootLayout(): React.JSX.Element | null {
   return (
     <GestureHandlerRootView style={styles.root}>
       <StatusBar style="light" backgroundColor={COLORS.BG_PRIMARY} />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: COLORS.BG_PRIMARY },
-          headerTintColor: COLORS.TEXT_PRIMARY,
-          headerTitleStyle: { fontWeight: '500' },
-          contentStyle: { backgroundColor: COLORS.BG_PRIMARY },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="settings" />
       </Stack>
     </GestureHandlerRootView>
   );
@@ -32,7 +26,7 @@ export default function RootLayout(): React.JSX.Element | null {
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
+    flex:            1,
     backgroundColor: COLORS.BG_PRIMARY,
   },
 });

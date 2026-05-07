@@ -1,19 +1,29 @@
 {
   "expo": {
-    "name": "GoldenHourAlarm",
+    "name": "Golden Hour Alarm",
     "slug": "GoldenHourAlarm",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "app-factory-template",
+    "scheme": "goldenhouralarm",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Golden Hour Alarm needs your location to calculate golden and blue hour times for your exact position.",
+        "NSLocationAlwaysUsageDescription": "Golden Hour Alarm uses your location to calculate golden and blue hour times."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#111111"
-      }
+        "backgroundColor": "#0E1117"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -23,7 +33,21 @@
       "expo-router",
       "expo-font",
       "expo-asset",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Golden Hour Alarm needs your location to calculate golden and blue hour times."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/.gitkeep",
+          "color": "#F5A623",
+          "sounds": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

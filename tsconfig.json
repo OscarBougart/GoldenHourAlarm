@@ -11,7 +11,8 @@
       "@/constants/*": ["constants/*"],
       "@/assets/*": ["assets/*"],
       "@/utils/*": ["utils/*"],
-      "@/data/*": ["data/*"]
+      "@/data/*": ["data/*"],
+      "@/src/*": ["src/*"]
     },
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

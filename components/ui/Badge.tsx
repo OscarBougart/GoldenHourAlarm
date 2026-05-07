@@ -11,9 +11,9 @@ export interface BadgeProps {
 }
 
 const VARIANT_STYLES: Record<BadgeVariant, { bg: string; text: string }> = {
-  amber:   { bg: COLORS.AMBER_DIM,  text: COLORS.AMBER },
-  red:     { bg: COLORS.RED_DIM,    text: COLORS.RED },
-  green:   { bg: COLORS.GREEN_DIM,  text: COLORS.GREEN },
+  amber:   { bg: COLORS.ACCENT_DIM, text: COLORS.ACCENT },
+  red:     { bg: 'rgba(255,107,107,0.20)', text: COLORS.RED },
+  green:   { bg: 'rgba(46,204,113,0.20)',  text: COLORS.GREEN },
   default: { bg: COLORS.BG_ELEVATED, text: COLORS.TEXT_SECONDARY },
 };
 
